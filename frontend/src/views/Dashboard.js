@@ -4,8 +4,6 @@ import React, { useState, useEffect } from "react";
 
 // reactstrap components
 import { Button, Row, Col, Collapse, Card, CardBody } from "reactstrap";
-import LoginButton from "../components/Auth0/LogInButton";
-import LogoutButton from "../components/Auth0/LogOutButton";
 import IssueList from "../components/Lists/IssueList";
 import ModalNewIssue from "../components/Modals/ModalNewIssue";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -50,18 +48,13 @@ function Dashboard(props) {
 
       <div className="content">
         <Row>
-          {!isAuthenticated && <LoginButton />}
-          {isAuthenticated && <LogoutButton />}
-        </Row>
-
-        <Row>
           <Col>
             <Button block color="primary" onClick={() => toggleCollapse()}>
               Open the flood gates of the never ending backlog
             </Button>
             <Collapse isOpen={collapseIsOpen}>
               <BacklogTable
-                issues={issues.filter((issue) => issue.status === "backlog")}
+                issues={issues?.filter((issue) => issue.status === "backlog")}
                 setReFetchData={setReFetchData}
               />
             </Collapse>
@@ -76,22 +69,25 @@ function Dashboard(props) {
           <Col md="4">
             <IssueList
               loading={loading}
-              issues={issues.filter((issue) => issue.status === "in_progress")}
+              issues={issues?.filter((issue) => issue.status === "in_progress")}
               setReFetchData={setReFetchData}
+              status={"in progress"}
             />
           </Col>
           <Col md="4">
             <IssueList
               loading={loading}
-              issues={issues.filter((issue) => issue.status === "QA")}
+              issues={issues?.filter((issue) => issue.status === "QA")}
               setReFetchData={setReFetchData}
+              status={"in QA"}
             />
           </Col>
           <Col md="4">
             <IssueList
               loading={loading}
-              issues={issues.filter((issue) => issue.status === "resolved")}
+              issues={issues?.filter((issue) => issue.status === "resolved")}
               setReFetchData={setReFetchData}
+              status={"resolved"}
             />
           </Col>
         </Row>

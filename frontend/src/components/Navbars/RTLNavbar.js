@@ -36,13 +36,14 @@ import {
   Container,
   Modal,
   ModalHeader,
-  NavbarToggler
+  NavbarToggler,
 } from "reactstrap";
 
 function AdminNavbar(props) {
   const [collapseOpen, setcollapseOpen] = React.useState(false);
   const [modalSearch, setmodalSearch] = React.useState(false);
   const [color, setcolor] = React.useState("navbar-transparent");
+
   React.useEffect(() => {
     window.addEventListener("resize", updateColor);
     // Specify how to clean up after this effect:
@@ -78,7 +79,7 @@ function AdminNavbar(props) {
           <div className="navbar-wrapper">
             <div
               className={classNames("navbar-toggle d-inline", {
-                toggled: props.sidebarOpened
+                toggled: props.sidebarOpened,
               })}
             >
               <NavbarToggler type="button" onClick={props.toggleSidebar}>

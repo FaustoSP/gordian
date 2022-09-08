@@ -18,6 +18,7 @@
 import React from "react";
 // nodejs library that concatenates classes
 import classNames from "classnames";
+import { useAuth0 } from "@auth0/auth0-react";
 
 // reactstrap components
 import {
@@ -36,13 +37,16 @@ import {
   Container,
   Modal,
   NavbarToggler,
-  ModalHeader
+  ModalHeader,
 } from "reactstrap";
 
 function AdminNavbar(props) {
   const [collapseOpen, setcollapseOpen] = React.useState(false);
   const [modalSearch, setmodalSearch] = React.useState(false);
   const [color, setcolor] = React.useState("navbar-transparent");
+  const { user, isAuthenticated, isLoading, logout, loginWithRedirect } =
+    useAuth0();
+
   React.useEffect(() => {
     window.addEventListener("resize", updateColor);
     // Specify how to clean up after this effect:
@@ -78,7 +82,7 @@ function AdminNavbar(props) {
           <div className="navbar-wrapper">
             <div
               className={classNames("navbar-toggle d-inline", {
-                toggled: props.sidebarOpened
+                toggled: props.sidebarOpened,
               })}
             >
               <NavbarToggler onClick={props.toggleSidebar}>
@@ -87,7 +91,7 @@ function AdminNavbar(props) {
                 <span className="navbar-toggler-bar bar3" />
               </NavbarToggler>
             </div>
-            <NavbarBrand href="#pablo" onClick={(e) => e.preventDefault()}>
+            <NavbarBrand href="" onClick={(e) => e.preventDefault()}>
               {props.brandText}
             </NavbarBrand>
           </div>
@@ -97,80 +101,86 @@ function AdminNavbar(props) {
             <span className="navbar-toggler-bar navbar-kebab" />
           </NavbarToggler>
           <Collapse navbar isOpen={collapseOpen}>
-            <Nav className="ml-auto" navbar>
-              <InputGroup className="search-bar">
-                <Button color="link" onClick={toggleModalSearch}>
-                  <i className="tim-icons icon-zoom-split" />
-                  <span className="d-lg-none d-md-block">Search</span>
-                </Button>
-              </InputGroup>
-              <UncontrolledDropdown nav>
-                <DropdownToggle
-                  caret
-                  color="default"
-                  data-toggle="dropdown"
-                  nav
-                >
-                  <div className="notification d-none d-lg-block d-xl-block" />
-                  <i className="tim-icons icon-sound-wave" />
-                  <p className="d-lg-none">Notifications</p>
-                </DropdownToggle>
-                <DropdownMenu className="dropdown-navbar" right tag="ul">
-                  <NavLink tag="li">
-                    <DropdownItem className="nav-item">
-                      Mike John responded to your email
-                    </DropdownItem>
-                  </NavLink>
-                  <NavLink tag="li">
-                    <DropdownItem className="nav-item">
-                      You have 5 more tasks
-                    </DropdownItem>
-                  </NavLink>
-                  <NavLink tag="li">
-                    <DropdownItem className="nav-item">
-                      Your friend Michael is in town
-                    </DropdownItem>
-                  </NavLink>
-                  <NavLink tag="li">
-                    <DropdownItem className="nav-item">
-                      Another notification
-                    </DropdownItem>
-                  </NavLink>
-                  <NavLink tag="li">
-                    <DropdownItem className="nav-item">
-                      Another one
-                    </DropdownItem>
-                  </NavLink>
-                </DropdownMenu>
-              </UncontrolledDropdown>
-              <UncontrolledDropdown nav>
-                <DropdownToggle
-                  caret
-                  color="default"
-                  nav
-                  onClick={(e) => e.preventDefault()}
-                >
-                  <div className="photo">
-                    <img alt="..." src={require("assets/img/anime3.png")} />
-                  </div>
-                  <b className="caret d-none d-lg-block d-xl-block" />
-                  <p className="d-lg-none">Log out</p>
-                </DropdownToggle>
-                <DropdownMenu className="dropdown-navbar" right tag="ul">
-                  <NavLink tag="li">
-                    <DropdownItem className="nav-item">Profile</DropdownItem>
-                  </NavLink>
-                  <NavLink tag="li">
-                    <DropdownItem className="nav-item">Settings</DropdownItem>
-                  </NavLink>
-                  <DropdownItem divider tag="li" />
-                  <NavLink tag="li">
-                    <DropdownItem className="nav-item">Log out</DropdownItem>
-                  </NavLink>
-                </DropdownMenu>
-              </UncontrolledDropdown>
-              <li className="separator d-lg-none" />
-            </Nav>
+            {!isAuthenticated && (
+              <Button
+                type="secondary"
+                className="ml-auto"
+                size="small"
+                onClick={() => loginWithRedirect()}
+              >
+                Log in
+              </Button>
+            )}
+            {isAuthenticated && (
+              <Nav className="ml-auto" navbar>
+                <UncontrolledDropdown nav>
+                  <DropdownToggle
+                    caret
+                    color="default"
+                    data-toggle="dropdown"
+                    nav
+                  >
+                    <div className="notification d-none d-lg-block d-xl-block" />
+                    <i className="tim-icons icon-sound-wave" />
+                    <p className="d-lg-none">Notifications</p>
+                  </DropdownToggle>
+                  <DropdownMenu className="dropdown-navbar" right tag="ul">
+                    <NavLink tag="li">
+                      <DropdownItem className="nav-item">
+                        Mike John responded to your email
+                      </DropdownItem>
+                    </NavLink>
+                    <NavLink tag="li">
+                      <DropdownItem className="nav-item">
+                        You have 5 more tasks
+                      </DropdownItem>
+                    </NavLink>
+                    <NavLink tag="li">
+                      <DropdownItem className="nav-item">
+                        Your friend Michael is in town
+                      </DropdownItem>
+                    </NavLink>
+                    <NavLink tag="li">
+                      <DropdownItem className="nav-item">
+                        Another notification
+                      </DropdownItem>
+                    </NavLink>
+                    <NavLink tag="li">
+                      <DropdownItem className="nav-item">
+                        Another one
+                      </DropdownItem>
+                    </NavLink>
+                  </DropdownMenu>
+                </UncontrolledDropdown>
+                <UncontrolledDropdown nav>
+                  <DropdownToggle
+                    caret
+                    color="default"
+                    nav
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    <div className="photo">
+                      <img alt="..." src={user?.picture} />
+                    </div>
+                    <b className="caret d-none d-lg-block d-xl-block" />
+                    <p className="d-lg-none">Log out</p>
+                  </DropdownToggle>
+                  <DropdownMenu className="dropdown-navbar" right tag="ul">
+                    <NavLink tag="li">
+                      <DropdownItem
+                        className="nav-item"
+                        onClick={() =>
+                          logout({ returnTo: window.location.origin })
+                        }
+                      >
+                        Log out
+                      </DropdownItem>
+                    </NavLink>
+                  </DropdownMenu>
+                </UncontrolledDropdown>
+                <li className="separator d-lg-none" />
+              </Nav>
+            )}
           </Collapse>
         </Container>
       </Navbar>

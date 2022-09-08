@@ -30,6 +30,15 @@ const IssueCard = ({ issue, setReFetchData }) => {
     });
   };
 
+  const advanceState = () => {
+    let updatedIssue = issue;
+    if (updatedIssue.status === "in_progress") updatedIssue.status = "QA";
+    else updatedIssue.status = "resolved";
+    axios.put("http://localhost:8080/api/issue", updatedIssue).then(() => {
+      setReFetchData(Date.now());
+    });
+  };
+
   return (
     <tr key={issue.id}>
       <td>
@@ -54,25 +63,37 @@ const IssueCard = ({ issue, setReFetchData }) => {
               issue.title
             )}
             {!bodyIsEditable && (
-              <Button
-                color="link"
-                id="tooltip636901683"
-                title=""
-                type="button"
-                onClick={() => handleDelete(issue.id)}
-              >
-                <i className="tim-icons icon-trash-simple" />
-              </Button>
+              <>
+                <Button
+                  color="link"
+                  id="tooltip636901683"
+                  title=""
+                  type="button"
+                  onClick={() => handleDelete(issue.id)}
+                >
+                  <i className="tim-icons icon-trash-simple" />
+                </Button>
+
+                <Button
+                  color="link"
+                  id="tooltip636901683"
+                  title=""
+                  type="button"
+                  onClick={() => toggleEditBody()}
+                >
+                  <i className="tim-icons icon-pencil" />
+                </Button>
+              </>
             )}
-            {!bodyIsEditable && (
+            {!bodyIsEditable && !(issue.status === "resolved") && (
               <Button
                 color="link"
                 id="tooltip636901683"
                 title=""
                 type="button"
-                onClick={() => toggleEditBody()}
+                onClick={() => advanceState()}
               >
-                <i className="tim-icons icon-pencil" />
+                <i className="tim-icons icon-double-right" />
               </Button>
             )}
           </p>

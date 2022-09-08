@@ -12,13 +12,16 @@ import {
 } from "reactstrap";
 import IssueCard from "../DataDisplay/IssueCard";
 
-const IssueList = ({ loading, issues, setReFetchData }) => {
+//setRefecthData is used to rerender the parent component after a successful POST request to the database
+//status indicates the list, and the child component IssueCard, in which state their issues are (in_progress, QA or resolved)
+const IssueList = ({ loading, issues, setReFetchData, status }) => {
   return (
     <>
       <Card className="card-tasks">
         <CardHeader>
-          <h6 className="title d-inline">Tasks(5)</h6>
-          <p className="card-category d-inline"> today</p>
+          <h6 className="title d-inline">
+            Issues that are {status} ({issues?.length})
+          </h6>
           <UncontrolledDropdown>
             <DropdownToggle
               caret
