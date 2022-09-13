@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "https://demos.creative-tim.com/black-dashboard-react/#/admin/dashboard",
   "dependencies": {
+    "@ant-design/plots": "^1.2.2",
     "@auth0/auth0-react": "^1.10.2",
     "@fortawesome/fontawesome-free": "6.1.1",
     "@types/react": "^18.0.18",

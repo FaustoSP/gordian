@@ -85,7 +85,7 @@ const IssueCard = ({ issue, setReFetchData }) => {
                 </Button>
               </>
             )}
-            {!bodyIsEditable && !(issue.status === "resolved") && (
+            {!bodyIsEditable && issue.status !== "resolved" && (
               <Button
                 color="link"
                 id="tooltip636901683"

@@ -15,8 +15,10 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import { AvForm, AvField } from "availity-reactstrap-validation";
+import axios from "axios";
 
 // reactstrap components
 import {
@@ -27,14 +29,91 @@ import {
   CardFooter,
   CardText,
   FormGroup,
-  Form,
-  Input,
   Row,
   Col,
+  Fade,
 } from "reactstrap";
 
 function UserProfile() {
-  const { user, isAuthenticated } = useAuth0();
+  const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
+  const [userMetadata, setUserMetadata] = useState();
+  const [reloadPage, setReloadPage] = useState();
+  const [fadeIn, setFadeIn] = useState(false);
+
+  const getUserMetadata = async () => {
+    const domain = "dev-ddbdrxe2.us.auth0.com";
+
+    try {
+      const accessToken = await getAccessTokenSilently({
+        audience: `https://${domain}/api/v2/`,
+        scope:
+          "read:current_user update:current_user_metadata update:users update:users_app_metadata",
+      });
+
+      const userDetailsByIdUrl = `https://${domain}/api/v2/users/${user.sub}`;
+
+      const metadataResponse = await fetch(userDetailsByIdUrl, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const { user_metadata } = await metadataResponse.json();
+
+      setUserMetadata(user_metadata);
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
+
+  const handleSubmit = () => {
+    postUserMetadata().then(
+      setReloadPage(() => Date.now()),
+      setFadeIn(true),
+      setTimeout(() => {
+        setFadeIn(() => {
+          return false;
+        });
+      }, "5000")
+    );
+  };
+
+  const postUserMetadata = async () => {
+    const domain = "dev-ddbdrxe2.us.auth0.com";
+    const accessToken = await getAccessTokenSilently({
+      audience: `https://${domain}/api/v2/`,
+      scope:
+        "read:current_user update:current_user_metadata update:users update:users_app_metadata",
+    });
+
+    let options = {
+      method: "PATCH",
+      url: `https://${domain}/api/v2/users/${user.sub}`,
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      data: { user_metadata: userMetadata },
+    };
+
+    axios
+      .request(options)
+      .then(function (response) {
+        console.log(response.data);
+      })
+      .catch(function (error) {
+        console.error(error);
+      });
+  };
+
+  useEffect(() => {
+    console.log(userMetadata);
+    console.log(userMetadata?.team);
+  }, [userMetadata]);
+
+  useEffect(() => {
+    getUserMetadata();
+  }, [getAccessTokenSilently, user?.sub]);
 
   return (
     <>
@@ -42,73 +121,42 @@ function UserProfile() {
         <div className="content">
           <Row>
             <Col md="8">
-              <Card>
-                <CardHeader>
-                  <h5 className="title">Edit Profile</h5>
-                </CardHeader>
-                <CardBody>
-                  <Form>
+              <AvForm onValidSubmit={handleSubmit}>
+                <Card>
+                  <CardHeader>
+                    <h5 className="title">Edit Profile</h5>
+                  </CardHeader>
+                  <CardBody>
                     <Row>
                       <Col className="pr-md-1" md="5">
                         <FormGroup>
-                          <label>Company (disabled)</label>
-                          <Input
-                            defaultValue="Creative Code Inc."
-                            disabled
-                            placeholder="Company"
+                          <label>Team</label>
+                          <AvField
+                            name="team"
+                            placeholder={userMetadata?.team}
                             type="text"
+                            onChange={(e) => {
+                              setUserMetadata((prevState) => ({
+                                ...prevState,
+                                team: e.target.value,
+                              }));
+                            }}
                           />
                         </FormGroup>
                       </Col>
                       <Col className="px-md-1" md="3">
                         <FormGroup>
                           <label>Username</label>
-                          <Input
-                            defaultValue="michael23"
-                            placeholder="Username"
+                          <AvField
+                            name="username"
+                            placeholder={userMetadata?.username}
                             type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col className="pl-md-1" md="4">
-                        <FormGroup>
-                          <label htmlFor="exampleInputEmail1">
-                            Email address
-                          </label>
-                          <Input placeholder="mike@email.com" type="email" />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col className="pr-md-1" md="6">
-                        <FormGroup>
-                          <label>First Name</label>
-                          <Input
-                            defaultValue="Mike"
-                            placeholder="Company"
-                            type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col className="pl-md-1" md="6">
-                        <FormGroup>
-                          <label>Last Name</label>
-                          <Input
-                            defaultValue="Andrew"
-                            placeholder="Last Name"
-                            type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col md="12">
-                        <FormGroup>
-                          <label>Address</label>
-                          <Input
-                            defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
-                            placeholder="Home Address"
-                            type="text"
+                            onChange={(e) => {
+                              setUserMetadata((prevState) => ({
+                                ...prevState,
+                                username: e.target.value,
+                              }));
+                            }}
                           />
                         </FormGroup>
                       </Col>
@@ -116,28 +164,50 @@ function UserProfile() {
                     <Row>
                       <Col className="pr-md-1" md="4">
                         <FormGroup>
-                          <label>City</label>
-                          <Input
-                            defaultValue="Mike"
-                            placeholder="City"
+                          <label>First Name</label>
+                          <AvField
+                            name="firstName"
+                            placeholder={userMetadata?.firstName}
                             type="text"
+                            onChange={(e) => {
+                              setUserMetadata((prevState) => ({
+                                ...prevState,
+                                firstName: e.target.value,
+                              }));
+                            }}
                           />
                         </FormGroup>
                       </Col>
-                      <Col className="px-md-1" md="4">
+                      <Col className="pr-md-1" md="4">
                         <FormGroup>
-                          <label>Country</label>
-                          <Input
-                            defaultValue="Andrew"
-                            placeholder="Country"
+                          <label>Middle Name</label>
+                          <AvField
+                            name="middleName"
+                            placeholder={userMetadata?.middleName}
                             type="text"
+                            onChange={(e) => {
+                              setUserMetadata((prevState) => ({
+                                ...prevState,
+                                middleName: e.target.value,
+                              }));
+                            }}
                           />
                         </FormGroup>
                       </Col>
                       <Col className="pl-md-1" md="4">
                         <FormGroup>
-                          <label>Postal Code</label>
-                          <Input placeholder="ZIP Code" type="number" />
+                          <label>Last Name</label>
+                          <AvField
+                            name="lastName"
+                            placeholder={userMetadata?.lastName}
+                            type="text"
+                            onChange={(e) => {
+                              setUserMetadata((prevState) => ({
+                                ...prevState,
+                                lastName: e.target.value,
+                              }));
+                            }}
+                          />
                         </FormGroup>
                       </Col>
                     </Row>
@@ -145,25 +215,33 @@ function UserProfile() {
                       <Col md="8">
                         <FormGroup>
                           <label>About Me</label>
-                          <Input
+                          <AvField
+                            name="aboutMe"
                             cols="80"
-                            defaultValue="Lamborghini Mercy, Your chick she so thirsty, I'm in
-                            that two seat Lambo."
-                            placeholder="Here can be your description"
+                            placeholder={userMetadata?.about}
                             rows="4"
                             type="textarea"
+                            onChange={(e) => {
+                              setUserMetadata((prevState) => ({
+                                ...prevState,
+                                about: e.target.value,
+                              }));
+                            }}
                           />
                         </FormGroup>
                       </Col>
                     </Row>
-                  </Form>
-                </CardBody>
-                <CardFooter>
-                  <Button className="btn-fill" color="primary" type="submit">
-                    Save
-                  </Button>
-                </CardFooter>
-              </Card>
+                  </CardBody>
+                  <CardFooter>
+                    <Button className="btn-fill" color="primary" type="submit">
+                      Save
+                    </Button>
+                    <Fade in={fadeIn} tag="h5" className="mt-3">
+                      All changes saved!
+                    </Fade>
+                  </CardFooter>
+                </Card>
+              </AvForm>
             </Col>
             <Col md="4">
               <Card className="card-user">
@@ -176,9 +254,19 @@ function UserProfile() {
                     <div className="block block-four" />
                     <a href={user?.nickname}>
                       <img alt="..." className="avatar" src={user?.picture} />
-                      <h5 className="title">Mike Andrew</h5>
+                      <h5 className="title">
+                        {userMetadata?.firstName
+                          ? userMetadata?.firstName
+                          : "FIRST"}{" "}
+                        {userMetadata?.middleName
+                          ? userMetadata?.middleName
+                          : "MIDDLE"}{" "}
+                        {userMetadata?.lastName
+                          ? userMetadata?.lastName
+                          : "LAST"}
+                      </h5>
                     </a>
-                    <p className="description">Ceo/Co-Founder</p>
+                    <p className="description">{userMetadata?.role}</p>
                   </div>
                 </CardBody>
               </Card>

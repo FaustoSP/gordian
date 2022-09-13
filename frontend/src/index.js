@@ -30,19 +30,19 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import ThemeContextWrapper from "./components/ThemeWrapper/ThemeWrapper";
 import BackgroundColorWrapper from "./components/BackgroundColorWrapper/BackgroundColorWrapper";
 
-import {ErrorBoundary} from 'react-error-boundary'
+import { ErrorBoundary } from "react-error-boundary";
 import { Auth0Provider } from "@auth0/auth0-react";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
-function ErrorFallback({error, resetErrorBoundary}) {
+function ErrorFallback({ error, resetErrorBoundary }) {
   return (
     <div role="alert">
       <p>Something went wrong:</p>
       <pre>{error.message}</pre>
       <button onClick={resetErrorBoundary}>Try again</button>
     </div>
-  )
+  );
 }
 
 root.render(
@@ -50,21 +50,26 @@ root.render(
     domain="dev-ddbdrxe2.us.auth0.com"
     clientId="qtnP7lvRwuZDleQfCibFFW6lyRAglzT1"
     redirectUri={"http://localhost:3000/admin/dashboard"}
+    audience="https://dev-ddbdrxe2.us.auth0.com/api/v2/"
+    scope="read:current_user update:current_user_metadata"
   >
     <ThemeContextWrapper>
       <BackgroundColorWrapper>
         <BrowserRouter>
-        <ErrorBoundary
+          <ErrorBoundary
             FallbackComponent={ErrorFallback}
             onReset={() => {
               // reset the state of your app so the error doesn't happen again
             }}
           >
-          <Switch>
-            <Route path="/admin" render={(props) => <AdminLayout {...props} />} />
-            <Route path="/rtl" render={(props) => <RTLLayout {...props} />} />
-            <Redirect from="/" to="/admin/dashboard" />
-          </Switch>
+            <Switch>
+              <Route
+                path="/admin"
+                render={(props) => <AdminLayout {...props} />}
+              />
+              <Route path="/rtl" render={(props) => <RTLLayout {...props} />} />
+              <Redirect from="/" to="/admin/dashboard" />
+            </Switch>
           </ErrorBoundary>
         </BrowserRouter>
       </BackgroundColorWrapper>

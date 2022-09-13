@@ -1,8 +1,23 @@
+/*!
+
+=========================================================
+* Black Dashboard React v1.2.1
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/black-dashboard-react
+* Copyright 2022 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://github.com/creativetimofficial/black-dashboard-react/blob/master/LICENSE.md)
+
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+*/
+
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-// nodejs library that concatenates classes
-
-// reactstrap components
 import { Button, Row, Col, Collapse, Card, CardBody } from "reactstrap";
 import IssueList from "../components/Lists/IssueList";
 import ModalNewIssue from "../components/Modals/ModalNewIssue";
@@ -16,7 +31,36 @@ function Dashboard(props) {
   const [loading, setLoading] = useState(true);
   //state variable used to refetch the issues
   const [reFetchData, setReFetchData] = useState(0);
-  const { user, isAuthenticated, isLoading } = useAuth0();
+  const { user, isAuthenticated, isLoading, getAccessTokenSilently } =
+    useAuth0();
+
+  useEffect(() => {
+    const getUserMetadata = async () => {
+      const domain = "dev-ddbdrxe2.us.auth0.com";
+
+      try {
+        const accessToken = await getAccessTokenSilently({
+          audience: `https://${domain}/api/v2/`,
+          scope:
+            "read:current_user update:current_user_metadata update:users update:users_app_metadata",
+        });
+
+        const userDetailsByIdUrl = `https://${domain}/api/v2/users/${user.sub}`;
+
+        const metadataResponse = await fetch(userDetailsByIdUrl, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        const { user_metadata } = await metadataResponse.json();
+      } catch (e) {
+        console.log(e.message);
+      }
+    };
+
+    getUserMetadata();
+  }, [getAccessTokenSilently, user?.sub]);
 
   useEffect(() => {
     axios.get("http://localhost:8080/api/issue").then((response) => {
@@ -48,6 +92,11 @@ function Dashboard(props) {
 
       <div className="content">
         <Row>
+          <Button block color="primary" onClick={() => toggleModal()}>
+            New Issue
+          </Button>
+        </Row>
+        <Row>
           <Col>
             <Button block color="primary" onClick={() => toggleCollapse()}>
               Open the flood gates of the never ending backlog
@@ -59,11 +108,6 @@ function Dashboard(props) {
               />
             </Collapse>
           </Col>
-        </Row>
-        <Row>
-          <Button block color="primary" onClick={() => toggleModal()}>
-            New Issue
-          </Button>
         </Row>
         <Row>
           <Col md="4">

@@ -2,7 +2,7 @@ import React from "react";
 import { Table, Button } from "reactstrap";
 import axios from "axios";
 
-const BODY_CHARACTER_LIMIT = 60;
+const BODY_CHARACTER_LIMIT = 80;
 
 const truncateAndAddEllipsis = (str) => {
   return str.length > BODY_CHARACTER_LIMIT
@@ -24,7 +24,6 @@ const BacklogTable = ({ issues, setReFetchData }) => {
       <tr>
         <td>{issue.title}</td>
         <td>{truncateAndAddEllipsis(issue.body)}</td>
-        <td>To be implemented</td>
         <td>
           <Button
             color="secondary"
@@ -33,9 +32,6 @@ const BacklogTable = ({ issues, setReFetchData }) => {
             onClick={() => advanceStatus(issue)}
           >
             Take
-          </Button>
-          <Button color="secondary" size="sm">
-            Assign
           </Button>
         </td>
       </tr>
@@ -47,9 +43,8 @@ const BacklogTable = ({ issues, setReFetchData }) => {
       <Table>
         <thead>
           <tr>
-            <th width="15%">Title</th>
-            <th width="40%">Body</th>
-            <th width="20%">Assigned to</th>
+            <th width="25%">Title</th>
+            <th width="55%">Body</th>
             <th width="20%"></th>
           </tr>
         </thead>
