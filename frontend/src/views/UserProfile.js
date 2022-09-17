@@ -37,7 +37,7 @@ import {
 function UserProfile() {
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
   const [userMetadata, setUserMetadata] = useState();
-  const [reloadPage, setReloadPage] = useState();
+  const [_reloadPage, setReloadPage] = useState();
   const [fadeIn, setFadeIn] = useState(false);
 
   const getUserMetadata = async () => {

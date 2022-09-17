@@ -20,7 +20,7 @@ import axios from "axios";
 import { Pie } from "@ant-design/plots";
 
 // reactstrap components
-import { Card, CardHeader, CardBody, CardTitle, Row, Col } from "reactstrap";
+import { Card, CardBody, Row, Col } from "reactstrap";
 
 function Typography() {
   const [issues, setIssues] = useState();

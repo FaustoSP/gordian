@@ -18,7 +18,7 @@
 
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-import { Button, Row, Col, Collapse, Card, CardBody } from "reactstrap";
+import { Button, Row, Col, Collapse } from "reactstrap";
 import IssueList from "../components/Lists/IssueList";
 import ModalNewIssue from "../components/Modals/ModalNewIssue";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -31,8 +31,7 @@ function Dashboard(props) {
   const [loading, setLoading] = useState(true);
   //state variable used to refetch the issues
   const [reFetchData, setReFetchData] = useState(0);
-  const { user, isAuthenticated, isLoading, getAccessTokenSilently } =
-    useAuth0();
+  const { user, getAccessTokenSilently } = useAuth0();
 
   useEffect(() => {
     const getUserMetadata = async () => {
