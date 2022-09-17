@@ -5,4 +5,4 @@ Backend written with java and spring boot, connected to a local dockerized datab
 
 Currently being developed along with this readme, please come back soon for a detailed look into the project and all its features!
 
-![Farmers Market Finder Demo](gifs/"CRUD demo".gif)
+![Crud](gifs/CRUD.gif)
